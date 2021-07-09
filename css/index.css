@@ -1,7 +1,7 @@
-#dropdown-selected-indicator:not(:empty)::before {
+#clean-profiles-selected:not(:empty)::before {
     content: "(";
 }
 
-#dropdown-selected-indicator:not(:empty)::after {
+#clean-profiles-selected:not(:empty)::after {
     content: ")";
 }

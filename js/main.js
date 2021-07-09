@@ -40,15 +40,15 @@ $(()=>{
         $("#webpage-text").articulate('speak');
     });
 
-    $(".dropdown-menu").on("click", "li", (event)=>{
+    $("#clean-profiles").on("click", "li", (event)=>{
         let cleanPreset = event.target.innerHTML;
         let $webpageText = $("#webpage-text");
         switch(cleanPreset) {
             case "Wikipedia":
-                $("#dropdown-selected-indicator").text("Wikipedia");
+                $("#clean-profiles-selected").text("Wikipedia");
                 break;
             case "sci-fit.net":
-                $("#dropdown-selected-indicator").text("sci-fit.net");
+                $("#clean-profiles-selected").text("sci-fit.net");
                 break;
             case "Request clean preset":
                 window.open("mailto: weffung@ucdavis.edu");
