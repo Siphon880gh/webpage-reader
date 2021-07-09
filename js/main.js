@@ -11,11 +11,11 @@ $(()=>{
 
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
-            $("#download").click();
+            $("#preview").click();
         }
     })
 
-    $("#download").on("click", ()=>{
+    $("#preview").on("click", ()=>{
         const url = $("#enter-url").val();
         if(url.length===0) return;
 
