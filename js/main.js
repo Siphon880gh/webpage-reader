@@ -45,8 +45,10 @@ $(()=>{
         let $webpageText = $("#webpage-text");
         switch(cleanPreset) {
             case "Wikipedia":
+                $("#dropdown-selected-indicator").text("Wikipedia");
                 break;
             case "sci-fit.net":
+                $("#dropdown-selected-indicator").text("sci-fit.net");
                 break;
         }
     });

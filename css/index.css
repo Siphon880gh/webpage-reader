@@ -1,0 +1,7 @@
+#dropdown-selected-indicator:not(:empty)::before {
+    content: "(";
+}
+
+#dropdown-selected-indicator:not(:empty)::after {
+    content: ")";
+}
