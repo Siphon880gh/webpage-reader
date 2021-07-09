@@ -59,11 +59,26 @@ $(()=>{
     });
 
     $("#clean-profiles li").on("click", (event)=>{
+        event.stopPropagation();
+        event.preventDefault();
+
+        function executeCleanScript(scriptFile) {
+            $.get(`profiles/${scriptFile}.js`).done(scriptCode=>{
+                // jQuery seems to run the js file when it gets.
+                // let scriptEl = document.createElement("script");
+                // scriptEl.innerText = scriptCode;
+                // document.querySelector("body").append(scriptEl);
+            }).fail(()=>{
+                alert("Error: Cleaning profile doesn't exist. Please let webmaster know.");
+            });
+
+        }
         let cleanPreset = event.target.innerText;
         let $webpageText = $("#webpage-text");
         switch(cleanPreset) {
             case "Wikipedia":
                 $("#clean-profiles-selected").text("Wikipedia");
+                executeCleanScript("wikipedia");
                 break;
             case "sci-fit.net":
                 $("#clean-profiles-selected").text("sci-fit.net");
