@@ -32,6 +32,18 @@ $(()=>{
                 searchParams.set("url", url);
                 let searchParamsStr = searchParams.toString();
                 history.pushState({}, "", "?" + searchParamsStr);
+
+                $("#clean-profiles li").each((i,li)=>{ 
+                    if(!li.dataset.domain) return true; 
+                    
+                    let domain = li.dataset.domain.toLowerCase(); 
+                    let isMatchesUrl = $("#enter-url").val().toLowerCase().indexOf(domain)>-1; 
+                    
+                    console.table({isMatchesUrl, domain}); 
+                    
+                    if(isMatchesUrl) $(li).click(); 
+                });
+
             } // else
         });
     });
@@ -40,8 +52,8 @@ $(()=>{
         $("#webpage-text").articulate('speak');
     });
 
-    $("#clean-profiles").on("click", "li", (event)=>{
-        let cleanPreset = event.target.innerHTML;
+    $("#clean-profiles li").on("click", (event)=>{
+        let cleanPreset = event.target.innerText;
         let $webpageText = $("#webpage-text");
         switch(cleanPreset) {
             case "Wikipedia":
