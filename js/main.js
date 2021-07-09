@@ -50,6 +50,9 @@ $(()=>{
             case "sci-fit.net":
                 $("#dropdown-selected-indicator").text("sci-fit.net");
                 break;
+            case "Request clean preset":
+                window.open("mailto: weffung@ucdavis.edu");
+                break;
         }
     });
 
