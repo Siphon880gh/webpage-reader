@@ -1,1 +1,1 @@
-alert("hi")
+$("img, #toc, .mw-editsection, #mw-navigation, #Further_reading, #catlinks, [role='navigation'], #References, .refbegin, .reflist, #footer").remove()
