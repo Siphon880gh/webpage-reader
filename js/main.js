@@ -30,7 +30,25 @@ $(()=>{
             if(viewsource.replace(regex, "").length===0)
                 alert("URL doesn't look right.\nPlease make sure full URL beginning with https://www.");
             else {
+
+                let $domAPI = $("<div/>");
+
                 // Set unclean view source
+                $domAPI.html(viewsource);
+                $domAPI.find("title, head, meta, link, style, script, noscript, img, data").remove();
+                $domAPI.find("*:empty").remove();
+                viewsource = $domAPI.html();
+
+                viewsource = viewsource.replace(/<!--[\s\S]*?-->/g, "");
+                viewsource = viewsource.replace(/<\/div>/g, ".\n</div>");
+                viewsource = viewsource.replace(/<\/p>/g, ".\n</p>");
+                viewsource = viewsource.replace(/<\/br>/g, "\n</br>");
+                viewsource = viewsource.replace(/<\/main>/g, ".\n</main>");
+                viewsource = viewsource.replace(/<\/article>/g, ".\n</article>");
+                viewsource = viewsource.replace(/\n{2,}/g, ".\n");
+
+                // $wrapper.text($wrapper.text());
+                // $wrapper.text($wrapper.text().replace(/\n{2,}/g, '\n'));
                 $("#webpage-text").html(viewsource);
 
                 // Set url parameter
@@ -45,8 +63,7 @@ $(()=>{
                     let domain = li.dataset.domain.toLowerCase(); 
                     let isMatchesUrl = $("#enter-url").val().toLowerCase().indexOf(domain)>-1; 
                     
-                    console.table({isMatchesUrl, domain}); 
-                    
+                    // console.table({isMatchesUrl, domain}); 
                     if(isMatchesUrl) $(li).click(); 
                 });
 
@@ -64,7 +81,7 @@ $(()=>{
 
         function executeCleanScript(scriptFile) {
             $.get(`profiles/${scriptFile}.js`).done(scriptCode=>{
-                // jQuery seems to run the js file when it gets.
+                // jquery runs js files that are get
                 // let scriptEl = document.createElement("script");
                 // scriptEl.innerText = scriptCode;
                 // document.querySelector("body").append(scriptEl);

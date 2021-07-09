@@ -5,3 +5,10 @@
 #clean-profiles-selected:not(:empty)::after {
     content: ")";
 }
+
+#webpage-text {
+    /* display: block;
+    unicode-bidi: embed;
+    font-family: monospace; */
+    white-space: pre;
+}
