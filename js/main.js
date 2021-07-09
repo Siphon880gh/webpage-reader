@@ -7,10 +7,17 @@ $(()=>{
             let regex = new RegExp("/w", "g");
             if(viewsource.replace(regex, "").length===0)
                 alert("Please check URL. Make sure full URL beginning with https://www.");
-            else
+            else {
+                // Set unclean view source
                 $("#webpage-text").html(viewsource);
+
+                // Set url parameter
+                let searchParams = new URLSearchParams("");
+                searchParams.set("url", url);
+                let searchParamsStr = searchParams.toString();
+                history.pushState({}, "", "?" + searchParamsStr);
+            } // else
         });
-        
     });
 
     $("#read").on("click", ()=>{
