@@ -6,6 +6,9 @@ $(()=>{
         let url = searchParam.get("url");
         if(url) {
             $("#enter-url").val(url);
+            setTimeout(()=>{
+                $("#preview").click();
+            }, 1100)
         }
     })();
 
@@ -17,12 +20,15 @@ $(()=>{
 
     $("#preview").on("click", ()=>{
         const url = $("#enter-url").val();
-        if(url.length===0) return;
+        if(url.length===0) {
+            alert("What's the webpage you want me to read?\nPlease enter the full URL starting with https://www.");
+            return;
+        };
 
         $.get("./php/viewer.php?url=" + url).done(viewsource => {
-            let regex = new RegExp("/w", "g");
+            let regex = new RegExp("\s", "g");
             if(viewsource.replace(regex, "").length===0)
-                alert("Please check URL. Make sure full URL beginning with https://www.");
+                alert("URL doesn't look right.\nPlease make sure full URL beginning with https://www.");
             else {
                 // Set unclean view source
                 $("#webpage-text").html(viewsource);
