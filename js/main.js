@@ -1,5 +1,14 @@
 $(()=>{
 
+    // onload check if we want a particular URL inputted
+    (function checkIfURLSearchParamURL(){
+        let searchParam = new URLSearchParams(window.location.search);
+        let url = searchParam.get("url");
+        if(url) {
+            $("#enter-url").val(url);
+        }
+    })();
+
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
             $("#download").click();
