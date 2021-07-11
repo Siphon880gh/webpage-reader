@@ -1,3 +1,7 @@
+let settings = {
+    betweenQueue: 300
+}
+
 $(()=>{
 
     // onload check if we want a particular URL inputted
@@ -59,7 +63,7 @@ $(()=>{
 
                 // $wrapper.text($wrapper.text());
                 // $wrapper.text($wrapper.text().replace(/\n{2,}/g, '\n'));
-                $("#webpage-text").html(viewsource);
+                $("#webpage-text #previewed").html(viewsource);
 
                 // Set url parameter
                 let searchParams = new URLSearchParams("");
@@ -113,23 +117,36 @@ $(()=>{
     }); // $("#clean-profiles li").on("click"
 
     $("#read").on("click", ()=>{
-        // Is there any textareas aka reading queues in DOM form to be made out of the previewed / cleaned preview?
-        if($("#webpage-text").length===0) return false;
+        // Is there reading queues in DOM form to be made out of the previewed / cleaned preview?
+        if($("#webpage-text").text().length===0) return false;
 
-        // Remove old textareas aka reading queues in DOM form
-        // $("#webpage-text textarea").remove();
+        // Remove old reading queues in DOM form
+        // $("#webpage-text .queued").remove();
 
-        // Add textareas aka reading queues in DOM form from the previewed / cleaned preview
+        // Add reading queues in DOM form from the previewed / cleaned preview
         // ...
 
-        let $readingQueue = $("#webpage-text textarea").toArray();
+        debugger;
+        let $readingQueue = $("#webpage-text .queued").toArray();
         let activeAt = -1;
 
         // Articulate js does not support events to detect when a reading finished for invoking a callback.
         // But it does support a method that returns the state of articulate, speaking or not (Note, paused is considered still speaking)
         let activePoll = setInterval(()=>{
+            let isSpeaking = $().articulate('isSpeaking');
+            if(!isSpeaking) {
+                activeAt++;
+                if(activeAt >= $readingQueue.length) {
+                    clearInterval(activePoll);
+                } else {
+                    $($readingQueue[activeAt]).articulate("speak");
+                }
 
-        }, 1000); 
+            }
+            
+  
+
+        }, settings.betweenQueue); 
         
         $("#webpage-text textarea").map((i,textarea)=>{
             $(textarea).articulate("speak");
