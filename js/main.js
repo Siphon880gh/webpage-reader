@@ -58,6 +58,44 @@ $(()=>{
             $tips.fadeIn(2000);
         }, 6000);
     })();
+    
+
+    // Estimate reading time by checking if a textnode. If not, recursively checks for all textnodes in descendents.
+    // Dividing the number of textnodes by some reasonable factor will get you the estimated reading time.
+    // The estimated reading time may be a little off depending on the length of the average word and the speed of
+    // the voice on the user's device.
+    window.getWebpageEstimatedReadingTime = function() {
+        var textContainer = "#webpage-text #previewed";
+
+        return (function getEstimatedTime(textContainer) {
+            function getTextNodesIn(element) {
+                var wordcount = 0,
+                    whitespace = /^s*$/;
+
+                function getTextNode(node) {
+                    // type 3 is a textnode
+                    if (node.nodeType == 3) {
+                        // We skip text nodes that are only whitespaces
+                        if (!whitespace.test(node.nodeValue)) {
+                            wordcount += node.nodeValue.split(" ").length;
+                        }
+                    // if this isn't a text node, recursively test each childnode
+                    } else {
+                        for (var i = 0, len = node.childNodes.length; i < len; ++i) {
+                            getTextNode(node.childNodes[i]);
+                        }
+                    }
+                }
+            
+                getTextNode(element);
+                return wordcount;
+            }
+            
+            // Estimated reading time factor 165-250
+            return (getTextNodesIn(textContainer) / 165).toFixed(2); // in minutes
+        }(document.querySelector(textContainer)));
+
+    } // estimateReadingTime
 
     // Pressing "Enter" on URL input -> Clicks preview button for user
     $("#enter-url").on("keyup", (event)=> {
@@ -176,16 +214,15 @@ $(()=>{
         let arrayWords = Array.from(text.matchAll(/[\w\n\t\.!\?,:;]+/g)).map(el=>el[0]);
 
         window.aQueueText = "";
-        window.charLimit=32766; // 245 // 319
+        window.charLimit=32757; // Remove ~10 characters for room for the last word to be added
         arrayWords.forEach((word,i)=>{
             if(i<arrayWords.length-1 && aQueueText.length + word.length < charLimit) {
                 aQueueText+=word + " ";
             } else {
-                // let $newQueue = $("<div/>").addClass("queued").attr("contenteditable", true).text(`Autodetect and select the clean profile based on URL. Refactored: View id's; UX: Numbered controls. UX: Validation messages at URL input; Feature: onload the URL search param URL and preview the page. Runs clean profile.`);
+                aQueueText+=word + " ";
                 let $newQueue = $("<div/>").addClass("queued").attr("contenteditable", true).text(aQueueText);
                 $("#webpage-text").append($newQueue);
                 aQueueText = "";
-                aQueueText+=word + " ";
             }
         });
 
