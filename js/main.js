@@ -59,12 +59,14 @@ $(()=>{
         }, 6000);
     })();
 
+    // Pressing "Enter" on URL input -> Clicks preview button for user
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
             $("#preview").click();
         }
     })
 
+    // Pressing preview button will download the webpage to the preview component
     $("#preview").on("click", ()=>{
         const url = $("#enter-url").val();
         if(url.length===0) {
@@ -121,8 +123,9 @@ $(()=>{
 
             } // else
         });
-    });
+    }); // prevew on click
 
+    // Select a cleaning profile to make the preview look more readable to the human eyes
     $("#clean-profiles li").on("click", (event)=>{
         event.stopPropagation();
         event.preventDefault();
@@ -154,6 +157,7 @@ $(()=>{
         }
     }); // $("#clean-profiles li").on("click"
 
+    // Read button will extract text from the preview and read it
     $("#read").on("click", ()=>{
         // Is there reading queues in DOM form to be made out of the previewed / cleaned preview?
         if($("#webpage-text").text().length===0) return false;
@@ -164,7 +168,6 @@ $(()=>{
 
         // Add reading queues in DOM form from the previewed / cleaned preview
         // - The maximum length of the text that can be spoken in each utterance is 32767
-        // - Actually, articulate js 2 looks like it has a smaller text maximum length
         let text = $("#webpage-text #previewed").text();
         text = text.replaceAll(/(\n\t){2,}/gm, "\n\t")
                     .replaceAll(/(\n\t\t){2,}/gm, "\n\t\t")
@@ -219,8 +222,6 @@ $(()=>{
             }
         }, settings.betweenQueue);
         
-    });
-
-
+    }); // read on click
 
 });
