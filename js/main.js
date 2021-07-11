@@ -141,9 +141,11 @@ $(()=>{
             if(!isSpeaking) {
                 activeAt++;
                 if(activeAt >= $readingQueue.length) {
+                    $("#webpage-text .queued.active").removeClass("active");
                     clearInterval(activePoll);
                 } else {
-                    $($readingQueue[activeAt]).articulate("speak");
+                    $("#webpage-text .queued.active").removeClass("active");
+                    $($readingQueue[activeAt]).addClass("active").articulate("speak");
                 }
             }
         }, settings.betweenQueue); 
