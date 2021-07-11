@@ -53,6 +53,7 @@ $(()=>{
 
                 viewsource = $domAPI.html();
 
+                // Add newlines where it may be appropriate, to encourage pausing during speaking
                 viewsource = viewsource.replace(/<!--[\s\S]*?-->/g, "");
                 viewsource = viewsource.replace(/<\/div>/g, ".\n</div>");
                 viewsource = viewsource.replace(/<\/p>/g, ".\n</p>");
@@ -121,12 +122,15 @@ $(()=>{
         if($("#webpage-text").text().length===0) return false;
 
         // Remove old reading queues in DOM form
+        // - get text and remove redundant double/triple lines and pausing periods as much as possible
+        let text = $("#webpage-text #previewed").text();
+        text = text.replaceAll(/(\n\t){2,}/gm, "\n\t").replaceAll(/(\n\t\t){2,}/gm, "\n\t\t").replaceAll(/\n{2,}/gm, "\n").replaceAll(/(\n\.){2,}/gm, "\n.");
+
         // $("#webpage-text .queued").remove();
 
         // Add reading queues in DOM form from the previewed / cleaned preview
         // ...
 
-        debugger;
         let $readingQueue = $("#webpage-text .queued").toArray();
         let activeAt = -1;
 
@@ -141,16 +145,9 @@ $(()=>{
                 } else {
                     $($readingQueue[activeAt]).articulate("speak");
                 }
-
             }
-            
-  
-
         }, settings.betweenQueue); 
         
-        $("#webpage-text textarea").map((i,textarea)=>{
-            $(textarea).articulate("speak");
-        });
     });
 
 });
