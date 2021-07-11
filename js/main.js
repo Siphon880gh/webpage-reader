@@ -123,21 +123,46 @@ $(()=>{
 
         // Remove old reading queues in DOM form
         // - get text and remove redundant double/triple lines and pausing periods as much as possible
-        let text = $("#webpage-text #previewed").text();
-        text = text.replaceAll(/(\n\t){2,}/gm, "\n\t").replaceAll(/(\n\t\t){2,}/gm, "\n\t\t").replaceAll(/\n{2,}/gm, "\n").replaceAll(/(\n\.){2,}/gm, "\n.");
-
-        // $("#webpage-text .queued").remove();
+        $("#webpage-text .queued").remove();
 
         // Add reading queues in DOM form from the previewed / cleaned preview
-        // ...
+        // - The maximum length of the text that can be spoken in each utterance is 32,767
+        // - Actually, articulate js 2 looks like it has a smaller text maximum length
+        let text = $("#webpage-text #previewed").text();
+        text = text.replaceAll(/(\n\t){2,}/gm, "\n\t").replaceAll(/(\n\t\t){2,}/gm, "\n\t\t").replaceAll(/\n{2,}/gm, "\n").replaceAll(/(\n\.){2,}/gm, "\n.");
+        let arrayWords = Array.from(text.matchAll(/[\w\n\t\.!\?,:;]+/g)).map(el=>el[0]);
 
-        let $readingQueue = $("#webpage-text .queued").toArray();
-        let activeAt = -1;
+        var aQueueText = "";
+        var charLimit=319;
+        arrayWords.forEach((word,i)=>{
+            if(i<arrayWords.length-1 && aQueueText.length + word.length < charLimit) {
+                aQueueText+=word + " ";
+            } else {
+                let $newQueue = $("<div/>").addClass("queued").text(aQueueText)
+                $("#webpage-text").append($newQueue);
+                aQueueText = "";
+                aQueueText+=word + " ";
+            }
+        });
+
+
 
         // Articulate js does not support events to detect when a reading finished for invoking a callback.
         // But it does support a method that returns the state of articulate, speaking or not (Note, paused is considered still speaking)
-        let activePoll = setInterval(()=>{
-            let isSpeaking = $().articulate('isSpeaking');
+        let $readingQueue = $("#webpage-text .queued");
+        let activeAt = -1;
+        let started = false;
+        let activePoll = setInterval(()=>{;
+            let isSpeaking = false;
+            if(!started) {
+                isSpeaking = false;
+                started = true;
+            } else {
+                isSpeaking = $readingQueue.eq(activeAt).articulate('isSpeaking')
+            }
+            // console.log("Is at queue:" + activeAt);
+            // console.log("Is reading? " + isSpeaking);
+
             if(!isSpeaking) {
                 activeAt++;
                 if(activeAt >= $readingQueue.length) {
@@ -145,7 +170,7 @@ $(()=>{
                     clearInterval(activePoll);
                 } else {
                     $("#webpage-text .queued.active").removeClass("active");
-                    $($readingQueue[activeAt]).addClass("active").articulate("speak");
+                    $readingQueue.eq(activeAt).addClass("active").articulate("speak");
                 }
             }
         }, settings.betweenQueue); 
