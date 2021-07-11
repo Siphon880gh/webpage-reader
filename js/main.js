@@ -1,11 +1,11 @@
 let settings = {
-    betweenQueue: 300
+    betweenQueue: 20
 }
 
 $(()=>{
 
     // onload check if we want a particular URL inputted
-    (function checkIfURLSearchParamURL(){
+    (function checkURLSearchParamURL(){
         let searchParam = new URLSearchParams(window.location.search);
         let url = searchParam.get("url");
         if(url) {
@@ -15,13 +15,22 @@ $(()=>{
             }, 1100)
         }
     })();
-    (function checkBrowserSupport() {
-        let isSupported = $().articulate('enabled');
+    (function checkBrowserSpeechSupport() {
+        let isSupported = Boolean("speechSynthesis" in window);
         if(!isSupported) {
             alert("Error: Your browser does not support Web Speech API. Try updating your web browser or changing web browser.")
         }
     })();
-    setInterval(() => { speechSynthesis.pause(); speechSynthesis.resume(); }, 5000);
+    (function fixBrowserBugCuttingSpeech() {
+        // Known bug in Chrome where speech is cut between 200-300 characters. Then the code will think it's still speaking, so it never knows to go to the next text portion in the queue
+        // The easiest workaround is to pause and resume reasonably before those characters are reached.
+        // Chrome has not prioritized to fix this bug for years.
+        // Source: https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
+        setInterval(() => { 
+            speechSynthesis.pause(); 
+            speechSynthesis.resume(); 
+        }, 5000);
+    })();
 
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
@@ -127,7 +136,7 @@ $(()=>{
         $("#webpage-text .queued").remove();
 
         // Add reading queues in DOM form from the previewed / cleaned preview
-        // - The maximum length of the text that can be spoken in each utterance is 32,767
+        // - The maximum length of the text that can be spoken in each utterance is 32767
         // - Actually, articulate js 2 looks like it has a smaller text maximum length
         let text = $("#webpage-text #previewed").text();
         text = text.replaceAll(/(\n\t){2,}/gm, "\n\t")
@@ -137,7 +146,7 @@ $(()=>{
         let arrayWords = Array.from(text.matchAll(/[\w\n\t\.!\?,:;]+/g)).map(el=>el[0]);
 
         window.aQueueText = "";
-        window.charLimit=245; // 319
+        window.charLimit=32766; // 245 // 319
         arrayWords.forEach((word,i)=>{
             if(i<arrayWords.length-1 && aQueueText.length + word.length < charLimit) {
                 aQueueText+=word + " ";
@@ -182,35 +191,6 @@ $(()=>{
                 }
             }
         }, settings.betweenQueue);
-
-
-        // Articulate js does not support events to detect when a reading finished for invoking a callback.
-        // But it does support a method that returns the state of articulate, speaking or not (Note, paused is considered still speaking)
-        // let $readingQueue = $("#webpage-text .queued");
-        // let activeAt = -1;
-        // let started = false;
-        // let activePoll = setInterval(()=>{;
-        //     let isSpeaking = false;
-        //     if(!started) {
-        //         isSpeaking = false;
-        //         started = true;
-        //     } else {
-        //         isSpeaking = $readingQueue.eq(activeAt).articulate('isSpeaking')
-        //     }
-        //     // console.log("Is at queue:" + activeAt);
-        //     // console.log("Is reading? " + isSpeaking);
-
-        //     if(!isSpeaking) {
-        //         activeAt++;
-        //         if(activeAt >= $readingQueue.length) {
-        //             $("#webpage-text .queued.active").removeClass("active");
-        //             clearInterval(activePoll);
-        //         } else {
-        //             $("#webpage-text .queued.active").removeClass("active");
-        //             $readingQueue.eq(activeAt).addClass("active").articulate("speak");
-        //         }
-        //     }
-        // }, settings.betweenQueue); 
         
     });
 
