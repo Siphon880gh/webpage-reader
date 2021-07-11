@@ -15,12 +15,16 @@ $(()=>{
             }, 1100)
         }
     })();
+
+    // onload check browser supports web speech API
     (function checkBrowserSpeechSupport() {
         let isSupported = Boolean("speechSynthesis" in window);
         if(!isSupported) {
             alert("Error: Your browser does not support Web Speech API. Try updating your web browser or changing web browser.")
         }
     })();
+
+    // Fix speech cutting bug
     (function fixBrowserBugCuttingSpeech() {
         // Known bug in Chrome where speech is cut between 200-300 characters. Then the code will think it's still speaking, so it never knows to go to the next text portion in the queue
         // The easiest workaround is to pause and resume reasonably before those characters are reached.
@@ -30,6 +34,29 @@ $(()=>{
             speechSynthesis.pause(); 
             speechSynthesis.resume(); 
         }, 5000);
+    })();
+
+    // Tip animation
+    (function animateTips() {
+        let $tips = $("#tips");
+        let tips = [
+            "On mobile? Make sure not muted.",
+            "You can enter text into the preview.",
+            "After a webpage is loaded into preview, you can still modify the text."
+        ];
+        activeTap=-1;
+
+        setInterval(()=>{
+            console.log(activeTap);
+            if(activeTap===tips.length-1) {
+                activeTap = 0;
+            } else {
+                activeTap++;
+            }
+
+            $tips.fadeOut(2000, ()=>{ $tips.html(tips[activeTap]); })
+            $tips.fadeIn(2000);
+        }, 6000);
     })();
 
     $("#enter-url").on("keyup", (event)=> {
@@ -193,5 +220,7 @@ $(()=>{
         }, settings.betweenQueue);
         
     });
+
+
 
 });

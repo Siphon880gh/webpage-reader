@@ -22,3 +22,11 @@
 #webpage-text .queued {
     overflow: auto;
 }
+
+#tips::before {
+    content: "Tip: ";
+}
+
+#tips:empty::after {
+    content: "Tips will show up here.";
+}
