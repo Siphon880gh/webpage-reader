@@ -13,7 +13,12 @@
     white-space: pre;
 }
 
-.queued.active {
+#webpage-text .queued.active {
     border: 2px solid blue;
     border-radius: 5px;
+}
+
+#webpage-text #previewed,
+#webpage-text .queued {
+    overflow: auto;
 }
