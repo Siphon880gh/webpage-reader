@@ -58,7 +58,6 @@ $(()=>{
             $tips.fadeIn(2000);
         }, 6000);
     })();
-    
 
     // Estimate reading time by checking if a textnode. If not, recursively checks for all textnodes in descendents.
     // Dividing the number of textnodes by some reasonable factor will get you the estimated reading time.
@@ -97,11 +96,15 @@ $(()=>{
 
     } // estimateReadingTime
 
+    // Handle keyup's on where user enters URL
     // Pressing "Enter" on URL input -> Clicks preview button for user
+    // Pressing any key will reset the estimated reading time text
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
             $("#preview").click();
         }
+
+        $("#estimated-reading-time").text("");
     })
 
     // Pressing preview button will download the webpage to the preview component
@@ -149,6 +152,7 @@ $(()=>{
                 let searchParamsStr = searchParams.toString();
                 history.pushState({}, "", "?" + searchParamsStr);
 
+                // Automatically match cleaning profile
                 $("#clean-profiles li").each((i,li)=>{ 
                     if(!li.dataset.domain) return true; 
                     
@@ -158,6 +162,9 @@ $(()=>{
                     // console.table({isMatchesUrl, domain}); 
                     if(isMatchesUrl) $(li).click(); 
                 });
+
+                // Indicate estimated reading time
+                $("#estimated-reading-time").text(`${getWebpageEstimatedReadingTime()} mins`);
 
             } // else
         });

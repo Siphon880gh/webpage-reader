@@ -10,6 +10,14 @@
     content: ")";
 }
 
+#estimated-reading-time:not(:empty)::before {
+    content: "(";
+}
+
+#estimated-reading-time:not(:empty)::after {
+    content: ")";
+}
+
 #webpage-text {
     /* display: block;
     unicode-bidi: embed;
