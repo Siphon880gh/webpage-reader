@@ -11,6 +11,12 @@ $(()=>{
             }, 1100)
         }
     })();
+    (function checkBrowserSupport() {
+        let isSupported = $().articulate('enabled');
+        if(!isSupported) {
+            alert("Error: Your browser does not support Web Speech API. Try updating your web browser or changing web browser.")
+        }
+    })();
 
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
@@ -35,8 +41,12 @@ $(()=>{
 
                 // Set unclean view source
                 $domAPI.html(viewsource);
+                // Remove these mostly nonvisual elements (img is visual, and script could be visual if it modifies the DOM or causes animations)
                 $domAPI.find("title, head, meta, link, style, script, noscript, img, data").remove();
+
+                // Remove empty text elements, theoretically except those which contains other elements containing text
                 $domAPI.find("*:empty").remove();
+
                 viewsource = $domAPI.html();
 
                 viewsource = viewsource.replace(/<!--[\s\S]*?-->/g, "");
@@ -71,10 +81,6 @@ $(()=>{
         });
     });
 
-    $("#read").on("click", ()=>{
-        $("#webpage-text").articulate('speak');
-    });
-
     $("#clean-profiles li").on("click", (event)=>{
         event.stopPropagation();
         event.preventDefault();
@@ -104,6 +110,30 @@ $(()=>{
                 window.open("mailto: weffung@ucdavis.edu");
                 break;
         }
+    }); // $("#clean-profiles li").on("click"
+
+    $("#read").on("click", ()=>{
+        // Is there any textareas aka reading queues in DOM form to be made out of the previewed / cleaned preview?
+        if($("#webpage-text").length===0) return false;
+
+        // Remove old textareas aka reading queues in DOM form
+        // $("#webpage-text textarea").remove();
+
+        // Add textareas aka reading queues in DOM form from the previewed / cleaned preview
+        // ...
+
+        let $readingQueue = $("#webpage-text textarea").toArray();
+        let activeAt = -1;
+
+        // Articulate js does not support events to detect when a reading finished for invoking a callback.
+        // But it does support a method that returns the state of articulate, speaking or not (Note, paused is considered still speaking)
+        let activePoll = setInterval(()=>{
+
+        }, 1000); 
+        
+        $("#webpage-text textarea").map((i,textarea)=>{
+            $(textarea).articulate("speak");
+        });
     });
 
 });
