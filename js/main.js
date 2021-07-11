@@ -21,6 +21,7 @@ $(()=>{
             alert("Error: Your browser does not support Web Speech API. Try updating your web browser or changing web browser.")
         }
     })();
+    setInterval(() => { speechSynthesis.pause(); speechSynthesis.resume(); }, 5000);
 
     $("#enter-url").on("keyup", (event)=> {
         if (event.keyCode === 13) {
@@ -129,36 +130,38 @@ $(()=>{
         // - The maximum length of the text that can be spoken in each utterance is 32,767
         // - Actually, articulate js 2 looks like it has a smaller text maximum length
         let text = $("#webpage-text #previewed").text();
-        text = text.replaceAll(/(\n\t){2,}/gm, "\n\t").replaceAll(/(\n\t\t){2,}/gm, "\n\t\t").replaceAll(/\n{2,}/gm, "\n").replaceAll(/(\n\.){2,}/gm, "\n.");
+        text = text.replaceAll(/(\n\t){2,}/gm, "\n\t")
+                    .replaceAll(/(\n\t\t){2,}/gm, "\n\t\t")
+                    .replaceAll(/\n{2,}/gm, "\n").replaceAll(/(\n\.){2,}/gm, "\n.")
+                    .replaceAll(/^\.\n/mg, "\n");
         let arrayWords = Array.from(text.matchAll(/[\w\n\t\.!\?,:;]+/g)).map(el=>el[0]);
 
-        var aQueueText = "";
-        var charLimit=319;
+        window.aQueueText = "";
+        window.charLimit=245; // 319
         arrayWords.forEach((word,i)=>{
             if(i<arrayWords.length-1 && aQueueText.length + word.length < charLimit) {
                 aQueueText+=word + " ";
             } else {
-                let $newQueue = $("<div/>").addClass("queued").text(aQueueText)
+                // let $newQueue = $("<div/>").addClass("queued").attr("contenteditable", true).text(`Autodetect and select the clean profile based on URL. Refactored: View id's; UX: Numbered controls. UX: Validation messages at URL input; Feature: onload the URL search param URL and preview the page. Runs clean profile.`);
+                let $newQueue = $("<div/>").addClass("queued").attr("contenteditable", true).text(aQueueText);
                 $("#webpage-text").append($newQueue);
                 aQueueText = "";
                 aQueueText+=word + " ";
             }
         });
 
-
-
-        // Articulate js does not support events to detect when a reading finished for invoking a callback.
-        // But it does support a method that returns the state of articulate, speaking or not (Note, paused is considered still speaking)
-        let $readingQueue = $("#webpage-text .queued");
-        let activeAt = -1;
-        let started = false;
-        let activePoll = setInterval(()=>{;
-            let isSpeaking = false;
+        // Speak each part of the queue and highlight them on the DOM too
+        window.$readingQueue = $("#webpage-text .queued");
+        window.activeAt = -1;
+        window.started = false;
+        window.synth = window.speechSynthesis;
+        window.activePoll = setInterval(()=>{;
+            window.isSpeaking = false;
             if(!started) {
                 isSpeaking = false;
                 started = true;
             } else {
-                isSpeaking = $readingQueue.eq(activeAt).articulate('isSpeaking')
+                isSpeaking = synth.speaking;
             }
             // console.log("Is at queue:" + activeAt);
             // console.log("Is reading? " + isSpeaking);
@@ -170,10 +173,44 @@ $(()=>{
                     clearInterval(activePoll);
                 } else {
                     $("#webpage-text .queued.active").removeClass("active");
-                    $readingQueue.eq(activeAt).addClass("active").articulate("speak");
+                    let $currentPortion = $readingQueue.eq(activeAt);
+                    $currentPortion.addClass("active")
+                    window.currentPortionText = $currentPortion.text();
+                    currentPortionText = currentPortionText.trim() + ".";
+                    currentPortionText = currentPortionText.replaceAll(/[\t]/gm, "").replaceAll(/\s{2,}/gm, " ").replaceAll(/\n/gm, ".");
+                    synth.speak(new SpeechSynthesisUtterance(currentPortionText));
                 }
             }
-        }, settings.betweenQueue); 
+        }, settings.betweenQueue);
+
+
+        // Articulate js does not support events to detect when a reading finished for invoking a callback.
+        // But it does support a method that returns the state of articulate, speaking or not (Note, paused is considered still speaking)
+        // let $readingQueue = $("#webpage-text .queued");
+        // let activeAt = -1;
+        // let started = false;
+        // let activePoll = setInterval(()=>{;
+        //     let isSpeaking = false;
+        //     if(!started) {
+        //         isSpeaking = false;
+        //         started = true;
+        //     } else {
+        //         isSpeaking = $readingQueue.eq(activeAt).articulate('isSpeaking')
+        //     }
+        //     // console.log("Is at queue:" + activeAt);
+        //     // console.log("Is reading? " + isSpeaking);
+
+        //     if(!isSpeaking) {
+        //         activeAt++;
+        //         if(activeAt >= $readingQueue.length) {
+        //             $("#webpage-text .queued.active").removeClass("active");
+        //             clearInterval(activePoll);
+        //         } else {
+        //             $("#webpage-text .queued.active").removeClass("active");
+        //             $readingQueue.eq(activeAt).addClass("active").articulate("speak");
+        //         }
+        //     }
+        // }, settings.betweenQueue); 
         
     });
 
