@@ -47,7 +47,7 @@ $(()=>{
         activeTap=-1;
 
         setInterval(()=>{
-            console.log(activeTap);
+            // console.log(activeTap);
             if(activeTap===tips.length-1) {
                 activeTap = 0;
             } else {
