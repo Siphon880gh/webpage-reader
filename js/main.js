@@ -221,7 +221,7 @@ $(()=>{
         let arrayWords = Array.from(text.matchAll(/[\w\n\t\.!\?,:;]+/g)).map(el=>el[0]);
 
         window.aQueueText = "";
-        window.charLimit=32757; // Remove ~10 characters for room for the last word to be added
+        window.charLimit=3000; // Remove ~10 characters for room for the last word to be added // 300 works for sure // 32757 was working for wiki jamhammer but not immune system // 3000 works for immune system
         arrayWords.forEach((word,i)=>{
             if(i<arrayWords.length-1 && aQueueText.length + word.length < charLimit) {
                 aQueueText+=word + " ";
