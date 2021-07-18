@@ -38,25 +38,36 @@ $(()=>{
 
     // Tip animation
     (function animateTips() {
-        let $tips = $("#tips");
-        let tips = [
+        var $tips = $("#tips");
+        window.tips = [
             "On mobile? Make sure not muted.",
+            "Still not playing? Do you have many tabs or apps taking up memory?",
             "You can enter text into the preview.",
-            "After a webpage is loaded into preview, you can still modify the text."
+            "After a webpage is loaded into preview, you can still modify the text before having the app read it."
         ];
-        activeTap=-1;
-
-        setInterval(()=>{
-            // console.log(activeTap);
-            if(activeTap===tips.length-1) {
-                activeTap = 0;
-            } else {
-                activeTap++;
+        window.activeTip=-1;
+        function advanceTip() {
+            var {$tips, tips} = this;
+            
+            activeTip++;
+            if(activeTip>tips.length-1) {
+                activeTip = 0;
             }
+            // console.log("activeTip: " + activeTip);
+            
 
-            $tips.fadeOut(2000, ()=>{ $tips.html(tips[activeTap]); })
+            $tips.fadeOut(2000, ()=>{ $tips.html(tips[activeTip]); })
             $tips.fadeIn(2000);
-        }, 6000);
+        }
+
+        // Move to next tip every several seconds or when user clicks a current tip to skip it
+        $tips.on("click", function() {
+            // So you wont advance tip manually and it advances tips twice because it's time (causing flashes of tips)
+            clearInterval(window.tipPoller);
+            window.tipPoller = setInterval(advanceTip.bind({$tips, tips}), 6000);
+            advanceTip.call({activeTip, $tips, tips});
+        });
+        window.tipPoller = setInterval(advanceTip.bind({$tips, tips}), 6000);
     })();
 
     // Estimate reading time by checking if a textnode. If not, recursively checks for all textnodes in descendents.
